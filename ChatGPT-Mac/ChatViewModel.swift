@@ -93,9 +93,11 @@ final class ChatViewModel: NSObject {
         webView.evaluateJavaScript("window.__cgptShare && window.__cgptShare()")
     }
 
-    /// Opens ChatGPT's model switcher menu.
+    /// Opens ChatGPT's model switcher menu. Logged out, the native button is
+    /// centered in the toolbar, so the web menu is repositioned to match.
     func openModelMenu() {
-        webView.evaluateJavaScript("window.__cgptOpenModelMenu && window.__cgptOpenModelMenu()")
+        let centered = !isLoggedIn
+        webView.evaluateJavaScript("window.__cgptOpenModelMenu && window.__cgptOpenModelMenu(\(centered))")
     }
 
     /// Switches the home screen's Chat / Work mode.
@@ -210,14 +212,18 @@ extension ChatViewModel: WKNavigationDelegate, WKUIDelegate {
                 decisionHandler(.allow)
                 return
             }
-            // Only ChatGPT itself and the sign-in flows stay in-app; every other
-            // main-frame navigation opens in the default browser. Note only
-            // OpenAI's auth hosts are allowed — help center, TOS, and the rest
-            // of openai.com go to the browser.
+            // Only ChatGPT itself and the sign-in flows stay in-app; other
+            // main-frame navigations open in the default browser — but only when
+            // the user actually clicked a link. Server redirects and form
+            // submissions always load in place: OAuth flows (e.g. Google) hop
+            // through hosts outside the allowlist (accounts.youtube.com,
+            // googleapis.com, ...) after credentials are entered, and bouncing
+            // those to the browser breaks sign-in.
             let allowedSuffixes = [
                 "chatgpt.com", "chat.openai.com", "auth.openai.com", "auth0.com",
-                // Google sign-in
+                // Google sign-in (youtube/googleapis appear in its redirect chain)
                 "google.com", "googleusercontent.com", "gstatic.com", "recaptcha.net",
+                "googleapis.com", "youtube.com",
                 // Apple sign-in
                 "apple.com", "cdn-apple.com",
                 // Microsoft sign-in (personal and work/school accounts)
@@ -228,13 +234,14 @@ extension ChatViewModel: WKNavigationDelegate, WKUIDelegate {
                 "pingidentity.com", "pingone.com",
             ]
             let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
+            let isLinkClick = navigationAction.navigationType == .linkActivated
             if allowedSuffixes.contains(where: { host == $0 || host.hasSuffix("." + $0) }) {
                 decisionHandler(.allow)
-            } else if isMainFrame {
+            } else if isMainFrame && isLinkClick {
                 NSWorkspace.shared.open(url)
                 decisionHandler(.cancel)
             } else {
-                // Subframes (captchas, embeds) load in place.
+                // Redirects, form posts, and subframes (captchas, embeds) load in place.
                 decisionHandler(.allow)
             }
         }

@@ -18,8 +18,10 @@ struct ContentView: View {
                 // else (extending up beneath the toolbar).
                 HStack(spacing: 0) {
                     // A full-screen web dialog covers the sidebar region with the
-                    // opaque surface, so drop the glass panel to match.
-                    if model.isLoggedIn && model.sidebarVisible && !model.fullscreenDialogOpen {
+                    // opaque surface, so drop the glass panel to match. Keyed off
+                    // the web sidebar's actual presence (not login state) so the
+                    // logged-out page's sidebar gets glass too.
+                    if model.sidebarVisible && !model.fullscreenDialogOpen {
                         SidebarView()
                             .frame(width: SidebarView.width)
                             .transition(.move(edge: .leading))
@@ -75,7 +77,10 @@ struct ContentView: View {
                 }
 
                 if !model.modelName.isEmpty && !model.fullscreenDialogOpen {
-                    ToolbarItem {
+                    // Logged out there's no sidebar toggle pushing items right,
+                    // so the picker would sit over the sidebar column; center it
+                    // above the chat surface instead.
+                    ToolbarItem(placement: model.isLoggedIn ? .automatic : .principal) {
                         Button {
                             model.openModelMenu()
                         } label: {

@@ -336,8 +336,60 @@ enum Injection {
             }
             window.addEventListener('resize', function () { setTimeout(updateSidebarFrost, 100); });
 
+            function findSidebar() {
+                for (const sel of SIDEBAR_ROOTS) {
+                    const el = document.querySelector(sel);
+                    if (el) { return el; }
+                }
+                return null;
+            }
+
+            // Some routes (Library, Projects, GPTs, the logged-out page) paint
+            // their own opaque backgrounds on wrappers inside the sidebar that
+            // the static CSS doesn't cover. Clear any large panel-sized fill so
+            // the native glass always shows through, leaving small elements
+            // (hover pills, selection highlights) alone.
+            function clearSidebarBackgrounds() {
+                const sidebar = findSidebar();
+                if (!sidebar) { return; }
+                const rect = sidebar.getBoundingClientRect();
+                if (rect.width < 50) { return; }
+                const nodes = [sidebar].concat(Array.from(sidebar.querySelectorAll('*')));
+                for (const el of nodes) {
+                    if (el.classList && el.classList.contains('cgpt-frost-overlay')) { continue; }
+                    const r = el.getBoundingClientRect();
+                    if (r.width < rect.width * 0.8 || r.height < rect.height * 0.5) { continue; }
+                    const bg = getComputedStyle(el).backgroundColor;
+                    if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+                        el.style.setProperty('background-color', 'transparent', 'important');
+                        el.style.setProperty('background-image', 'none', 'important');
+                    }
+                }
+            }
+
+            // The web app can boot with its sidebar collapsed or in the compact
+            // icon rail. The app never shows those states: expand it via the
+            // (CSS-hidden, but still clickable) open-sidebar button, unless the
+            // user collapsed it natively (cgpt-hide-sidebar).
+            function ensureSidebarOpen() {
+                if (document.documentElement.classList.contains('cgpt-hide-sidebar')) { return; }
+                // Windows that hide the sidebar on purpose (floating chats,
+                // settings, aux panes) must not fight their own CSS.
+                if (document.getElementById('cgpt-floating-style')
+                    || document.getElementById('cgpt-settings-style')
+                    || document.getElementById('cgpt-aux-style')) { return; }
+                const sidebar = findSidebar();
+                if (sidebar && sidebar.offsetWidth >= 100) { return; }
+                const openButton = document.querySelector(
+                    '[data-testid="open-sidebar-button"], button[aria-label*="open sidebar" i]'
+                );
+                if (openButton) { openButton.click(); }
+            }
+
             let lastPayload = '';
             function report() {
+                ensureSidebarOpen();
+                clearSidebarBackgrounds();
                 updateSidebarFrost();
                 const loggedOut = !!document.querySelector(LOGGED_OUT_PROBE);
                 const loggedIn = !loggedOut && !!document.querySelector(LOGGED_IN_PROBE);
@@ -494,10 +546,34 @@ enum Injection {
                 return false;
             };
 
-            window.__cgptOpenModelMenu = function () {
+            // `centered` repositions the dropdown under the window's horizontal
+            // center: the menu is a popper anchored to the hidden web header
+            // button (top-left), but the native button that opens it is centered
+            // in the toolbar when logged out. Re-applies for a few frames since
+            // the popper sets its own transform asynchronously.
+            window.__cgptOpenModelMenu = function (centered) {
                 const button = document.querySelector('\#(modelSwitcherSelector)');
-                if (button) { button.click(); return true; }
-                return false;
+                if (!button) { return false; }
+                // Second click on the native button closes the open menu.
+                if (button.getAttribute('aria-expanded') === 'true'
+                    || button.getAttribute('data-state') === 'open') {
+                    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+                    return true;
+                }
+                button.click();
+                if (centered) {
+                    let tries = 0;
+                    const timer = setInterval(function () {
+                        tries++;
+                        if (tries > 20) { clearInterval(timer); return; }
+                        const wrapper = document.querySelector('[data-radix-popper-content-wrapper]');
+                        if (!wrapper) { return; }
+                        const width = wrapper.getBoundingClientRect().width;
+                        const x = Math.round((innerWidth - width) / 2);
+                        wrapper.style.setProperty('transform', 'translate(' + x + 'px, 8px)', 'important');
+                    }, 30);
+                }
+                return true;
             };
 
             // Opens the (hidden) conversation options dropdown, waits for its items to
