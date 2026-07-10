@@ -170,6 +170,17 @@ enum Injection {
         :root {
             --sidebar-surface-primary: transparent !important;
         }
+        /* The site's dark theme is pitch black, but its --main-surface-primary
+           token (and the Canvas fallback) is still a lighter gray; pin it to
+           black so the chat surface never shifts tone. */
+        html.dark,
+        html[data-theme="dark"] {
+            --main-surface-primary: #000 !important;
+        }
+        html.dark main,
+        html[data-theme="dark"] main {
+            background-color: #000 !important;
+        }
         \(sidebar),
         \(sidebarChildren) {
             background-color: transparent !important;

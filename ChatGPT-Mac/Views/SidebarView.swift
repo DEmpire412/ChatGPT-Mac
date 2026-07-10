@@ -23,10 +23,10 @@ struct SidebarView: View {
 }
 
 extension Color {
-    /// Matches chatgpt.com's page background: white in light mode, #212121 in dark mode.
+    /// Matches chatgpt.com's page background: white in light mode, pitch black in dark mode.
     static let chatGPTSurface = Color(nsColor: NSColor(name: nil) { appearance in
         appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-            ? NSColor(srgbRed: 0.129, green: 0.129, blue: 0.129, alpha: 1)
+            ? .black
             : .white
     })
 }
