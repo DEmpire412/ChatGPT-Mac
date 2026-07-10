@@ -1,0 +1,192 @@
+{
+  "source": "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Show or hide the sidebar (⌃⌘S)",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Chat (⌘N)",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reload (⌘R)",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Toggle Sidebar",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Chat",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reload",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 64
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mode",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 72
+        }
+      },
+      {
+        "comment": "",
+        "key": "Switch between Chat and Work",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "Switch model",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Turn off temporary chat",
+        "location": {
+          "startingColumn": 59,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Temporary chat",
+        "location": {
+          "startingColumn": 87,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Temporary Chat",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 106
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open this chat in a floating window",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open in Floating Window",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share conversation",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 131
+        }
+      },
+      {
+        "comment": "",
+        "key": "Share",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 129
+        }
+      },
+      {
+        "comment": "",
+        "key": "Conversation options",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Files in Chat",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 141
+        }
+      },
+      {
+        "comment": "",
+        "key": "Pin Chat",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 146
+        }
+      },
+      {
+        "comment": "",
+        "key": "Archive",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 157
+        }
+      },
+      {
+        "comment": "",
+        "key": "More",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 160
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sign in to ChatGPT to get started",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 181
+        }
+      }
+    ]
+  },
+  "version": 1
+}

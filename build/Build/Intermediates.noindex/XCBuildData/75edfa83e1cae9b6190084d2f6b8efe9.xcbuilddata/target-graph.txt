@@ -1,0 +1,2 @@
+Target dependency graph (1 target)
+Target 'ChatGPT-Mac' in project 'ChatGPT-Mac' (no dependencies)

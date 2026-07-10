@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>13</integer>
+	<key>logs</key>
+	<dict>
+		<key>70489400-AFAF-457B-9335-7B6AEE3F44C8</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>70489400-AFAF-457B-9335-7B6AEE3F44C8.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>ChatGPT-Mac project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ChatGPT-Mac</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project ChatGPT-Mac with scheme ChatGPT-Mac and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>805355355.44764996</real>
+			<key>timeStoppedRecording</key>
+			<real>805355357.012375</real>
+			<key>title</key>
+			<string>Building project ChatGPT-Mac with scheme ChatGPT-Mac and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>70489400-AFAF-457B-9335-7B6AEE3F44C8</string>
+		</dict>
+		<key>C0E0FB9B-084C-4646-B4C4-1830D9DD079D</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>C0E0FB9B-084C-4646-B4C4-1830D9DD079D.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>ChatGPT-Mac project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ChatGPT-Mac</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project ChatGPT-Mac with scheme ChatGPT-Mac and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>805355683.83711302</real>
+			<key>timeStoppedRecording</key>
+			<real>805355686.11030805</real>
+			<key>title</key>
+			<string>Building project ChatGPT-Mac with scheme ChatGPT-Mac and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>C0E0FB9B-084C-4646-B4C4-1830D9DD079D</string>
+		</dict>
+		<key>C41C83AA-C000-49A6-B27C-5A8C571A264A</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>C41C83AA-C000-49A6-B27C-5A8C571A264A.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>ChatGPT-Mac project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>ChatGPT-Mac</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project ChatGPT-Mac with scheme ChatGPT-Mac and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>805355891.19567204</real>
+			<key>timeStoppedRecording</key>
+			<real>805355893.42508698</real>
+			<key>title</key>
+			<string>Building project ChatGPT-Mac with scheme ChatGPT-Mac and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>C41C83AA-C000-49A6-B27C-5A8C571A264A</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

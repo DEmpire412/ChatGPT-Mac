@@ -1,0 +1,89 @@
+{
+  "" : {
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT-Mac-primary.dia",
+    "emit-module-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT-Mac-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT-Mac-primary-emit-module.dia",
+    "pch" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT-Mac-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT-Mac-primary.swiftdeps"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/ChatGPT_MacApp.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatGPT_MacApp~partial.swiftmodule"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/ChatViewModel.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatViewModel~partial.swiftmodule"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/ContentView.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/Views/FloatingChatView.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/FloatingChatView~partial.swiftmodule"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/Views/SidebarView.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/SidebarView~partial.swiftmodule"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/WebView/ChatWebView.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/ChatWebView~partial.swiftmodule"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/ChatGPT-Mac/WebView/Injection.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/Injection~partial.swiftmodule"
+  },
+  "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Intermediates.noindex/ChatGPT-Mac.build/Debug/ChatGPT-Mac.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}
