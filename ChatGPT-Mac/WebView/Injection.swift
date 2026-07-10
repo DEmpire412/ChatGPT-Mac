@@ -533,7 +533,7 @@ enum Injection {
                 // Menu items (profile menu) plus plain buttons/links, so the
                 // logged-out sidebar's "Settings" entry is routed natively too.
                 const item = e.target.closest('[role="menuitem"], button, a');
-                if (!item) { return; }
+                if (!item || item.closest('div[role="dialog"]')) { return; }
                 const label = (item.textContent || '').trim().toLowerCase();
                 if (label === 'settings' || label === 'personalization') {
                     // Logged out, the site's own settings popover is used
