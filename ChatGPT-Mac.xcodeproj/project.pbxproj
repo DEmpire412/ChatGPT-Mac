@@ -257,6 +257,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 2026.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.DavidSaporta.ChatGPT-Mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -292,6 +293,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 2026.7.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.DavidSaporta.ChatGPT-Mac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
