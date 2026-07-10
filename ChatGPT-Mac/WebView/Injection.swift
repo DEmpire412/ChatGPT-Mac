@@ -371,8 +371,13 @@ enum Injection {
             // icon rail. The app never shows those states: expand it via the
             // (CSS-hidden, but still clickable) open-sidebar button, unless the
             // user collapsed it natively (cgpt-hide-sidebar).
+            let lastSidebarVisible = false;
+
             function ensureSidebarOpen() {
                 if (document.documentElement.classList.contains('cgpt-hide-sidebar')) { return; }
+                // Don't fight modal overlays (e.g. chat search): clicking the
+                // open-sidebar button would dismiss them.
+                if (document.querySelector('div[role="dialog"]')) { return; }
                 // Windows that hide the sidebar on purpose (floating chats,
                 // settings, aux panes) must not fight their own CSS.
                 if (document.getElementById('cgpt-floating-style')
@@ -404,6 +409,11 @@ enum Injection {
                 const fullscreenDialog = (function () {
                     let found = false;
                     document.querySelectorAll('div[role="dialog"]').forEach(function (d) {
+                        // The chat-search modal is a centered overlay, not a
+                        // fullscreen takeover — leave it (and the sidebar) alone.
+                        if (d.querySelector('input[placeholder*="search" i], [data-testid*="search" i]')) {
+                            return;
+                        }
                         const r = d.getBoundingClientRect();
                         if (r.width >= innerWidth * 0.85 && r.height >= innerHeight * 0.75) {
                             d.classList.add('cgpt-fullscreen-dialog');
@@ -428,11 +438,17 @@ enum Injection {
                     appearance: themePreference(),
                     fullscreenDialogOpen: fullscreenDialog,
                     sidebarVisible: (function () {
+                        // While a modal (e.g. chat search) is up the web app may
+                        // hide the sidebar underneath; keep reporting the last
+                        // real state so the native glass doesn't flicker away.
+                        if (document.querySelector('div[role="dialog"]')) {
+                            return lastSidebarVisible;
+                        }
                         for (const sel of SIDEBAR_ROOTS) {
                             const el = document.querySelector(sel);
-                            if (el) { return el.offsetWidth > 50; }
+                            if (el) { return lastSidebarVisible = el.offsetWidth > 50; }
                         }
-                        return false;
+                        return lastSidebarVisible = false;
                     })(),
                 };
                 const payload = JSON.stringify(state);
