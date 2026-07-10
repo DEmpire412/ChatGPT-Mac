@@ -528,6 +528,21 @@ enum Injection {
                 return true;
             };
 
+            // Scales only the chat surface via CSS zoom on <main>; the sidebar
+            // and page chrome keep their normal size.
+            window.__cgptSetTextZoom = function (scale) {
+                var style = document.getElementById('cgpt-text-zoom');
+                if (!style) {
+                    style = document.createElement('style');
+                    style.id = 'cgpt-text-zoom';
+                    (document.head || document.documentElement).appendChild(style);
+                }
+                style.textContent = (!scale || scale === 1)
+                    ? ''
+                    : 'main { zoom: ' + scale + ' !important; }';
+                return true;
+            };
+
             window.__cgptNewChat = function () {
                 const target = document.querySelector(
                     '[data-testid="create-new-chat-button"], a[data-testid="new-chat-button"], nav a[href="/"]'

@@ -50,6 +50,24 @@ struct ChatGPT_MacApp: App {
                     model.goHome()
                 }
                 .keyboardShortcut("h", modifiers: [.command, .shift])
+
+                Divider()
+
+                // "=" so plain ⌘ and the +/= key works without shift.
+                Button("Increase Text Size") {
+                    model.increaseTextSize()
+                }
+                .keyboardShortcut("=", modifiers: .command)
+
+                Button("Decrease Text Size") {
+                    model.decreaseTextSize()
+                }
+                .keyboardShortcut("-", modifiers: .command)
+
+                Button("Actual Text Size") {
+                    model.resetTextSize()
+                }
+                .keyboardShortcut("0", modifiers: .command)
             }
         }
 

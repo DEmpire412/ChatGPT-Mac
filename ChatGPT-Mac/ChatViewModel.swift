@@ -47,7 +47,9 @@ final class ChatViewModel: NSObject {
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.customUserAgent = Injection.safariUserAgent
         webView.allowsBackForwardNavigationGestures = true
-        webView.allowsMagnification = true
+        // No page zoom (pinch or otherwise); text size is adjusted via
+        // ⌘+/⌘− instead, which scales only the chat surface.
+        webView.allowsMagnification = false
         // Transparent so the native glass sidebar panel shows through the
         // (CSS-cleared) web sidebar region; the chat column stays opaque via CSS.
         webView.underPageBackgroundColor = .clear
@@ -111,6 +113,33 @@ final class ChatViewModel: NSObject {
     /// Toggles ChatGPT's temporary chat mode.
     func toggleTemporaryChat() {
         webView.evaluateJavaScript("window.__cgptToggleTemporaryChat && window.__cgptToggleTemporaryChat()")
+    }
+
+    // MARK: - Chat text zoom
+
+    /// Scale factor applied to the chat surface (`main`) only — the sidebar
+    /// and the rest of the page keep their normal size.
+    private(set) var chatTextZoom: Double = 1.0
+
+    func increaseTextSize() {
+        setTextZoom(chatTextZoom + 0.1)
+    }
+
+    func decreaseTextSize() {
+        setTextZoom(chatTextZoom - 0.1)
+    }
+
+    func resetTextSize() {
+        setTextZoom(1.0)
+    }
+
+    private func setTextZoom(_ value: Double) {
+        chatTextZoom = min(max((value * 10).rounded() / 10, 0.5), 2.0)
+        applyTextZoom()
+    }
+
+    fileprivate func applyTextZoom() {
+        webView.evaluateJavaScript("window.__cgptSetTextZoom && window.__cgptSetTextZoom(\(chatTextZoom))")
     }
 
     /// Triggers an item from ChatGPT's conversation options ("...") menu by its label.
@@ -207,6 +236,16 @@ extension ChatViewModel: WKNavigationDelegate, WKUIDelegate {
             } else {
                 // Subframes (captchas, embeds) load in place.
                 decisionHandler(.allow)
+            }
+        }
+    }
+
+    // Reapply the chat text zoom after full page loads (reload, sign-in return),
+    // which wipe the injected zoom style.
+    nonisolated func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        MainActor.assumeIsolated {
+            if chatTextZoom != 1.0 {
+                applyTextZoom()
             }
         }
     }
