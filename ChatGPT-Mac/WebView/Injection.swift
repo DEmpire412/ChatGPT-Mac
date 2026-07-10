@@ -127,15 +127,26 @@ enum Injection {
         })();
         """
         // If the dialog gets dismissed (Escape, backdrop click), bring it back.
-        // Waits for the app shell (main) to exist and gives the dialog a couple
-        // of grace periods before forcing a reload, to avoid reload loops during boot.
+        // Before the dialog has been seen once, only nudge the hash (the SPA can
+        // take a while to hydrate); reloading during boot caused reload loops.
         let keepOpenSource = """
         (function () {
+            var seen = false;
             var missing = 0;
             setInterval(function () {
                 if (!document.querySelector('main')) { return; }
-                if (document.querySelector('div[role="dialog"]')) { missing = 0; return; }
+                if (document.querySelector('div[role="dialog"]')) { seen = true; missing = 0; return; }
                 missing++;
+                if (!seen) {
+                    // Still booting: re-assert the deep link, never reload.
+                    if (missing % 3 === 0) {
+                        var h = location.hash || '';
+                        var target = h.indexOf('settings') !== -1 ? h : '#settings/General';
+                        location.hash = '';
+                        location.hash = target;
+                    }
+                    return;
+                }
                 if (missing >= 2) {
                     missing = 0;
                     if ((location.hash || '').indexOf('settings') !== -1) {
@@ -147,9 +158,41 @@ enum Injection {
             }, 1200);
         })();
         """
+
+        // Deep-link fallback: the hash doesn't always select the right tab, so
+        // Swift retries this until the dialog is up and the tab is clicked.
+        // Scans every dialog (placeholders included) for tab-like elements.
+        let tabSource = """
+        (function () {
+            function candidates() {
+                var result = [];
+                document.querySelectorAll('div[role="dialog"]').forEach(function (dialog) {
+                    dialog.querySelectorAll('[role="tab"], [role="tablist"] button, nav button, nav a')
+                        .forEach(function (t) { result.push(t); });
+                });
+                return result;
+            }
+
+            window.__cgptSelectSettingsTab = function (name) {
+                var tabs = candidates();
+                if (!tabs.length) { return false; }
+                var wanted = (name || '').toLowerCase();
+                function label(t) { return (t.textContent || '').trim().toLowerCase(); }
+                var target = tabs.find(function (t) { return label(t) === wanted; })
+                    || tabs.find(function (t) { return label(t).indexOf(wanted) !== -1; });
+                if (!target) { return false; }
+                if (target.getAttribute('aria-selected') !== 'true'
+                    && target.getAttribute('data-state') !== 'active') {
+                    target.click();
+                }
+                return true;
+            };
+        })();
+        """
         return userScripts + [
             WKUserScript(source: styleSource, injectionTime: .atDocumentStart, forMainFrameOnly: true),
             WKUserScript(source: keepOpenSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true),
+            WKUserScript(source: tabSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true),
         ]
     }
 
@@ -487,10 +530,15 @@ enum Injection {
             // native settings window instead of the inline web dialog.
             document.addEventListener('click', function (e) {
                 if (!e.target || !e.target.closest) { return; }
-                const item = e.target.closest('[role="menuitem"]');
+                // Menu items (profile menu) plus plain buttons/links, so the
+                // logged-out sidebar's "Settings" entry is routed natively too.
+                const item = e.target.closest('[role="menuitem"], button, a');
                 if (!item) { return; }
                 const label = (item.textContent || '').trim().toLowerCase();
                 if (label === 'settings' || label === 'personalization') {
+                    // Logged out, the site's own settings popover is used
+                    // instead of the native window.
+                    if (document.querySelector(LOGGED_OUT_PROBE)) { return; }
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     post({ type: 'openSettings', tab: label });

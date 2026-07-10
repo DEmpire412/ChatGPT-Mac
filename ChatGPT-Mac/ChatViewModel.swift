@@ -107,6 +107,19 @@ final class ChatViewModel: NSObject {
         webView.evaluateJavaScript("window.__cgptSelectMode && window.__cgptSelectMode('\(escaped)')")
     }
 
+    /// Opens the web app's inline settings popover in the main window (used
+    /// when logged out, where the native settings window isn't available).
+    func showWebSettings() {
+        webView.evaluateJavaScript("""
+        if ((location.hash || '').indexOf('settings') === -1) {
+            location.hash = '#settings/General';
+        } else {
+            location.hash = '';
+            setTimeout(function () { location.hash = '#settings/General'; }, 0);
+        }
+        """)
+    }
+
     /// Collapses or expands the web sidebar (the native glass panel follows).
     func toggleSidebar() {
         webView.evaluateJavaScript("window.__cgptToggleSidebar && window.__cgptToggleSidebar()")
@@ -158,13 +171,18 @@ final class ChatViewModel: NSObject {
 
     // MARK: - Bridge
 
+    /// Asks ContentView to open the native settings window at the given tab.
+    func requestSettingsWindow(hash: String) {
+        requestedSettingsHash = hash
+        settingsOpenRequestID += 1
+    }
+
     fileprivate func handleBridgeMessage(_ body: [String: Any]) {
         if body["type"] as? String == "openSettings" {
             let tab = body["tab"] as? String ?? "settings"
-            requestedSettingsHash = tab == "personalization"
+            requestSettingsWindow(hash: tab == "personalization"
                 ? "#settings/Personalization"
-                : "#settings/General"
-            settingsOpenRequestID += 1
+                : "#settings/General")
             return
         }
         guard body["type"] as? String == "state" else { return }

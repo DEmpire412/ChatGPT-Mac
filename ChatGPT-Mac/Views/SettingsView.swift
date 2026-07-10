@@ -12,6 +12,7 @@ import WebKit
 
 struct SettingsView: View {
     @Environment(ChatViewModel.self) private var model
+    @Environment(\.dismissWindow) private var dismissWindow
     @State private var holder = SettingsWebViewHolder()
 
     var body: some View {
@@ -33,6 +34,16 @@ struct SettingsView: View {
             }
             .onChange(of: model.settingsOpenRequestID) {
                 holder.open(hash: model.requestedSettingsHash)
+            }
+            .onChange(of: model.isLoggedIn) {
+                if model.isLoggedIn {
+                    // The session changed under us (sign-in in the main window);
+                    // a full reload picks up the new cookies.
+                    holder.reload(hash: model.requestedSettingsHash)
+                } else {
+                    // The native settings window is a logged-in feature.
+                    dismissWindow(id: "settings")
+                }
             }
     }
 }
@@ -66,8 +77,35 @@ private final class SettingsWebViewHolder {
             let escaped = hash.replacingOccurrences(of: "'", with: "\\'")
             webView.evaluateJavaScript("location.hash = '\(escaped)'")
         } else {
-            hasLoaded = true
-            webView.load(URLRequest(url: URL(string: hash, relativeTo: Injection.homeURL) ?? Injection.settingsURL))
+            reload(hash: hash)
         }
+        // The hash deep link doesn't reliably select the tab; click it by
+        // label once the dialog has rendered.
+        if let tab = hash.split(separator: "/").last {
+            selectTab(named: String(tab))
+        }
+    }
+
+    private var tabSelectionAttempt = 0
+
+    private func selectTab(named name: String) {
+        tabSelectionAttempt += 1
+        let attempt = tabSelectionAttempt
+        let escaped = name.replacingOccurrences(of: "'", with: "\\'")
+        let call = "window.__cgptSelectSettingsTab ? window.__cgptSelectSettingsTab('\(escaped)') : false"
+        Task { @MainActor [webView] in
+            for _ in 0..<20 {
+                try? await Task.sleep(for: .milliseconds(500))
+                guard attempt == tabSelectionAttempt else { return }
+                let result = try? await webView.evaluateJavaScript(call)
+                if (result as? Bool) == true { return }
+            }
+        }
+    }
+
+    /// Full page load, picking up the current session's cookies.
+    func reload(hash: String) {
+        hasLoaded = true
+        webView.load(URLRequest(url: URL(string: hash, relativeTo: Injection.homeURL) ?? Injection.settingsURL))
     }
 }

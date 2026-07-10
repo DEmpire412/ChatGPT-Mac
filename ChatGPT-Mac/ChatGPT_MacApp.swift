@@ -25,7 +25,13 @@ struct ChatGPT_MacApp: App {
             // settings window instead of a SwiftUI Settings scene.
             CommandGroup(replacing: .appSettings) {
                 Button("Settings…") {
-                    openWindow(id: "settings")
+                    // The native settings window is a logged-in feature; logged
+                    // out, open the site's inline popover in the main window.
+                    if model.isLoggedIn {
+                        openWindow(id: "settings")
+                    } else {
+                        model.showWebSettings()
+                    }
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
