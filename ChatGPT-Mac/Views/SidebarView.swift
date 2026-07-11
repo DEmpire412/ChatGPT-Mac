@@ -23,11 +23,12 @@ struct SidebarView: View {
 }
 
 extension Color {
-    /// Matches chatgpt.com's page background: white in light mode, pitch black in dark mode.
+    /// Matches chatgpt.com's page background, including transparent web view gaps
+    /// exposed during scroll/overscroll.
     static let chatGPTSurface = Color(nsColor: NSColor(name: nil) { appearance in
         appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
             ? .black
-            : .white
+            : NSColor(calibratedRed: 247.0 / 255.0, green: 247.0 / 255.0, blue: 248.0 / 255.0, alpha: 1)
     })
 }
 
