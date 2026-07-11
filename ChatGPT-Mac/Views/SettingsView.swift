@@ -17,7 +17,7 @@ struct SettingsView: View {
 
     var body: some View {
         ChatWebView(webView: holder.webView)
-            .frame(minWidth: 850, idealWidth: 920, minHeight: 560, idealHeight: 700)
+            .frame(minWidth: 850, idealWidth: 920, minHeight: 600, idealHeight: 700)
             .ignoresSafeArea()
             .background(alignment: .leading) {
                 // Same treatment as the main window: native glass under the
@@ -48,6 +48,27 @@ struct SettingsView: View {
     }
 }
 
+private final class SettingsWebView: WKWebView {
+    private let windowDragHeight: CGFloat = 36
+    private let trafficLightReservedWidth: CGFloat = 84
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        let distanceFromTop = isFlipped ? point.y : bounds.height - point.y
+        if point.x >= trafficLightReservedWidth,
+           distanceFromTop >= 0,
+           distanceFromTop <= windowDragHeight {
+            return self
+        }
+        return super.hitTest(point)
+    }
+
+    override var mouseDownCanMoveWindow: Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        window?.performDrag(with: event)
+    }
+}
+
 @Observable
 @MainActor
 private final class SettingsWebViewHolder {
@@ -63,7 +84,7 @@ private final class SettingsWebViewHolder {
             configuration.userContentController.addUserScript(script)
         }
 
-        webView = WKWebView(frame: .zero, configuration: configuration)
+        webView = SettingsWebView(frame: .zero, configuration: configuration)
         webView.customUserAgent = Injection.safariUserAgent
         webView.underPageBackgroundColor = .clear
         webView.setValue(false, forKey: "drawsBackground")
