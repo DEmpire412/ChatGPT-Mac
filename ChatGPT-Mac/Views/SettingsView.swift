@@ -30,6 +30,10 @@ struct SettingsView: View {
                 .ignoresSafeArea()
             }
             .onAppear {
+                holder.setOpenInMainWindowHandler { url in
+                    dismissWindow(id: "settings")
+                    model.openInMainWindow(url)
+                }
                 holder.open(hash: model.requestedSettingsHash)
             }
             .onChange(of: model.settingsOpenRequestID) {
@@ -58,26 +62,81 @@ private final class SettingsWindowDragRegion: NSView {
     }
 }
 
+@MainActor
+private final class SettingsNavigationDelegate: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+    var openInMainWindow: ((URL) -> Void)?
+
+    nonisolated func userContentController(
+        _ userContentController: WKUserContentController,
+        didReceive message: WKScriptMessage
+    ) {
+        guard message.name == Injection.settingsNavigationHandlerName,
+              let body = message.body as? [String: Any],
+              body["type"] as? String == "openMainWindow",
+              let value = body["url"] as? String,
+              let url = URL(string: value) else { return }
+        Task { @MainActor [weak self] in
+            self?.openInMainWindow?(url)
+        }
+    }
+
+    nonisolated func webView(
+        _ webView: WKWebView,
+        decidePolicyFor navigationAction: WKNavigationAction,
+        decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void
+    ) {
+        Task { @MainActor [weak self] in
+            guard navigationAction.navigationType == .linkActivated,
+                  let url = navigationAction.request.url,
+                  let host = url.host() else {
+                decisionHandler(.allow)
+                return
+            }
+
+            let isChatGPT = host == "chatgpt.com" || host.hasSuffix(".chatgpt.com")
+            let isSettingsLink = url.fragment?.lowercased().hasPrefix("settings") == true
+            if isChatGPT && !isSettingsLink {
+                self?.openInMainWindow?(url)
+                decisionHandler(.cancel)
+            } else if !isChatGPT {
+                NSWorkspace.shared.open(url)
+                decisionHandler(.cancel)
+            } else {
+                decisionHandler(.allow)
+            }
+        }
+    }
+}
+
 @Observable
 @MainActor
 private final class SettingsWebViewHolder {
     let webView: WKWebView
     private var hasLoaded = false
     private let uiDelegate = FileUploadUIDelegate()
+    private let navigationDelegate: SettingsNavigationDelegate
 
     init() {
+        let navigationDelegate = SettingsNavigationDelegate()
+        self.navigationDelegate = navigationDelegate
+
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         for script in Injection.settingsWindowUserScripts {
             configuration.userContentController.addUserScript(script)
         }
+        configuration.userContentController.add(
+            navigationDelegate,
+            name: Injection.settingsNavigationHandlerName
+        )
 
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.customUserAgent = Injection.safariUserAgent
         webView.underPageBackgroundColor = .clear
         webView.setValue(false, forKey: "drawsBackground")
         webView.uiDelegate = uiDelegate
+        webView.navigationDelegate = navigationDelegate
 
         let dragRegion = SettingsWindowDragRegion()
         dragRegion.translatesAutoresizingMaskIntoConstraints = false
@@ -88,6 +147,10 @@ private final class SettingsWebViewHolder {
             dragRegion.topAnchor.constraint(equalTo: webView.topAnchor),
             dragRegion.heightAnchor.constraint(equalToConstant: 36),
         ])
+    }
+
+    func setOpenInMainWindowHandler(_ handler: @escaping (URL) -> Void) {
+        navigationDelegate.openInMainWindow = handler
     }
 
     /// Opens the settings dialog at the given tab hash (e.g. "#settings/Personalization"),

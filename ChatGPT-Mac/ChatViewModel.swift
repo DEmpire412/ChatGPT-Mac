@@ -88,6 +88,16 @@ final class ChatViewModel: NSObject {
         webView.load(URLRequest(url: Injection.homeURL))
     }
 
+    /// Navigates the persistent chat web view and brings its window forward.
+    /// Used when an auxiliary window links back into ChatGPT's main app surface.
+    func openInMainWindow(_ url: URL) {
+        guard let host = url.host(),
+              host == "chatgpt.com" || host.hasSuffix(".chatgpt.com") else { return }
+        webView.load(URLRequest(url: url))
+        NSApp.activate(ignoringOtherApps: true)
+        webView.window?.makeKeyAndOrderFront(nil)
+    }
+
     /// Opens ChatGPT's own share dialog for the current conversation.
     func share() {
         webView.evaluateJavaScript("window.__cgptShare && window.__cgptShare()")

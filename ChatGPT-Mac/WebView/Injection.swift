@@ -14,6 +14,7 @@ enum Injection {
     /// Deep link that opens the settings dialog in the web app.
     static let settingsURL = URL(string: "https://chatgpt.com/#settings/General")!
     static let messageHandlerName = "bridge"
+    static let settingsNavigationHandlerName = "settingsNavigation"
 
     /// Safari user agent so Google / Apple sign-in flows don't reject the embedded web view.
     static let safariUserAgent =
@@ -99,22 +100,24 @@ enum Injection {
         let navWidth = Int(settingsSidebarWidth)
         let css = """
         \(hideShell) { display: none !important; } \
-        div[role="dialog"] { position: fixed !important; inset: 0 !important; \
+        div.cgpt-settings-root { position: fixed !important; inset: 0 !important; \
         transform: none !important; translate: none !important; margin: 0 !important; \
         width: 100vw !important; height: 100vh !important; \
         max-width: none !important; max-height: none !important; \
         border-radius: 0 !important; box-shadow: none !important; border: none !important; \
         background-color: transparent !important; } \
-        div[role="dialog"] button[aria-label="Close" i] { display: none !important; } \
-        div[role="dialog"] [role="tablist"], div[role="dialog"] nav { \
+        .cgpt-settings-root-close { display: none !important; } \
+        .cgpt-settings-nav { \
         background-color: transparent !important; background-image: none !important; \
         padding-top: 20px !important; \
         width: \(navWidth)px !important; min-width: \(navWidth)px !important; max-width: \(navWidth)px !important; } \
-        div[role="dialog"] [role="tabpanel"] { \
+        .cgpt-settings-panel { \
         background-color: var(--main-surface-primary, Canvas) !important; }
         """
         let styleSource = """
         (function () {
+            var classificationScheduled = false;
+
             function install() {
                 if (document.getElementById('cgpt-settings-style')) { return; }
                 var style = document.createElement('style');
@@ -122,8 +125,72 @@ enum Injection {
                 style.textContent = '\(css)';
                 (document.head || document.documentElement).appendChild(style);
             }
+
+            // Only the outer settings dialog should fill this native window.
+            // Dialogs opened from it must keep the site's normal modal sheet
+            // layout, including their rounded card, backdrop, and close button.
+            function classifyDialogs() {
+                classificationScheduled = false;
+                var dialogs = Array.from(document.querySelectorAll('div[role="dialog"]'));
+                var labels = ['general', 'notifications', 'personalization', 'data controls'];
+                var root = null;
+                var bestScore = 0;
+
+                dialogs.forEach(function (dialog) {
+                    var text = (dialog.textContent || '').toLowerCase();
+                    var score = dialog.querySelector('[role="tablist"]') ? 4 : 0;
+                    labels.forEach(function (label) {
+                        if (text.indexOf(label) !== -1) { score++; }
+                    });
+                    if (score > bestScore) {
+                        root = dialog;
+                        bestScore = score;
+                    }
+                });
+
+                document.querySelectorAll(
+                    '.cgpt-settings-root, .cgpt-settings-root-close, ' +
+                    '.cgpt-settings-nav, .cgpt-settings-panel'
+                ).forEach(function (element) {
+                    element.classList.remove(
+                        'cgpt-settings-root',
+                        'cgpt-settings-root-close',
+                        'cgpt-settings-nav',
+                        'cgpt-settings-panel'
+                    );
+                });
+                if (!root || bestScore < 3) { return; }
+
+                root.classList.add('cgpt-settings-root');
+                root.querySelectorAll('button[aria-label="Close" i]').forEach(function (button) {
+                    if (button.closest('div[role="dialog"]') === root) {
+                        button.classList.add('cgpt-settings-root-close');
+                    }
+                });
+                root.querySelectorAll('[role="tablist"], nav').forEach(function (nav) {
+                    if (nav.closest('div[role="dialog"]') === root) {
+                        nav.classList.add('cgpt-settings-nav');
+                    }
+                });
+                root.querySelectorAll('[role="tabpanel"]').forEach(function (panel) {
+                    if (panel.closest('div[role="dialog"]') === root) {
+                        panel.classList.add('cgpt-settings-panel');
+                    }
+                });
+            }
+
+            function scheduleClassification() {
+                if (classificationScheduled) { return; }
+                classificationScheduled = true;
+                requestAnimationFrame(classifyDialogs);
+            }
+
             install();
-            new MutationObserver(install).observe(document.documentElement, { childList: true, subtree: false });
+            scheduleClassification();
+            new MutationObserver(function () {
+                install();
+                scheduleClassification();
+            }).observe(document.documentElement, { childList: true, subtree: true });
         })();
         """
         // If the dialog gets dismissed (Escape, backdrop click), bring it back.
@@ -189,10 +256,57 @@ enum Injection {
             };
         })();
         """
+        // Library links inside settings (such as Storage → Files / Images) belong
+        // in the app's persistent main web view, not in the settings-only view.
+        // Catch both ordinary anchors and client-side router transitions.
+        let navigationSource = """
+        (function () {
+            if (window.__cgptSettingsNavigationInstalled) { return; }
+            window.__cgptSettingsNavigationInstalled = true;
+
+            function isSettingsURL(url) {
+                return url.origin === location.origin
+                    && (url.hash || '').toLowerCase().indexOf('#settings') === 0;
+            }
+
+            function openInMainWindow(value) {
+                var url;
+                try { url = new URL(value, location.href); } catch (e) { return false; }
+                if (url.origin !== location.origin || isSettingsURL(url)) { return false; }
+                try {
+                    window.webkit.messageHandlers.\(settingsNavigationHandlerName)
+                        .postMessage({ type: 'openMainWindow', url: url.href });
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            document.addEventListener('click', function (event) {
+                if (!event.target || !event.target.closest) { return; }
+                var link = event.target.closest('a[href]');
+                if (!link || !openInMainWindow(link.href)) { return; }
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }, true);
+
+            ['pushState', 'replaceState'].forEach(function (name) {
+                var original = history[name];
+                history[name] = function () {
+                    if (arguments.length > 2 && arguments[2] != null
+                        && openInMainWindow(arguments[2])) {
+                        return;
+                    }
+                    return original.apply(this, arguments);
+                };
+            });
+        })();
+        """
         return userScripts + [
             WKUserScript(source: styleSource, injectionTime: .atDocumentStart, forMainFrameOnly: true),
             WKUserScript(source: keepOpenSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true),
             WKUserScript(source: tabSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true),
+            WKUserScript(source: navigationSource, injectionTime: .atDocumentEnd, forMainFrameOnly: true),
         ]
     }
 
@@ -457,6 +571,11 @@ enum Injection {
                 // Detect dialogs that (almost) cover the viewport, tag them so the
                 // CSS can stretch them, and let the native side clear its toolbar.
                 const fullscreenDialog = (function () {
+                    // The dedicated settings window classifies its own outer
+                    // dialog; dialogs opened above it must remain modal sheets.
+                    if (document.getElementById('cgpt-settings-style')) {
+                        return false;
+                    }
                     let found = false;
                     document.querySelectorAll('div[role="dialog"]').forEach(function (d) {
                         // The chat-search modal is a centered overlay, not a
