@@ -48,21 +48,10 @@ struct SettingsView: View {
     }
 }
 
-private final class SettingsWebView: WKWebView {
-    private let windowDragHeight: CGFloat = 36
-    private let trafficLightReservedWidth: CGFloat = 84
-
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        let distanceFromTop = isFlipped ? point.y : bounds.height - point.y
-        if point.x >= trafficLightReservedWidth,
-           distanceFromTop >= 0,
-           distanceFromTop <= windowDragHeight {
-            return self
-        }
-        return super.hitTest(point)
+private final class SettingsWindowDragRegion: NSView {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        true
     }
-
-    override var mouseDownCanMoveWindow: Bool { true }
 
     override func mouseDown(with event: NSEvent) {
         window?.performDrag(with: event)
@@ -84,11 +73,21 @@ private final class SettingsWebViewHolder {
             configuration.userContentController.addUserScript(script)
         }
 
-        webView = SettingsWebView(frame: .zero, configuration: configuration)
+        webView = WKWebView(frame: .zero, configuration: configuration)
         webView.customUserAgent = Injection.safariUserAgent
         webView.underPageBackgroundColor = .clear
         webView.setValue(false, forKey: "drawsBackground")
         webView.uiDelegate = uiDelegate
+
+        let dragRegion = SettingsWindowDragRegion()
+        dragRegion.translatesAutoresizingMaskIntoConstraints = false
+        webView.addSubview(dragRegion, positioned: .above, relativeTo: nil)
+        NSLayoutConstraint.activate([
+            dragRegion.leadingAnchor.constraint(equalTo: webView.leadingAnchor, constant: 84),
+            dragRegion.trailingAnchor.constraint(equalTo: webView.trailingAnchor),
+            dragRegion.topAnchor.constraint(equalTo: webView.topAnchor),
+            dragRegion.heightAnchor.constraint(equalToConstant: 36),
+        ])
     }
 
     /// Opens the settings dialog at the given tab hash (e.g. "#settings/Personalization"),
