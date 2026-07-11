@@ -30,6 +30,7 @@ final class ChatViewModel: NSObject {
     /// menu -> Settings / Personalization). Observed by ContentView to open the
     /// window and by SettingsView to jump to the requested tab.
     private(set) var settingsOpenRequestID = 0
+    private(set) var settingsReloadRequestID = 0
     private(set) var requestedSettingsHash = "#settings/General"
 
     let webView: WKWebView
@@ -82,6 +83,7 @@ final class ChatViewModel: NSObject {
         } else {
             webView.reload()
         }
+        settingsReloadRequestID += 1
     }
 
     func goHome() {

@@ -39,6 +39,9 @@ struct SettingsView: View {
             .onChange(of: model.settingsOpenRequestID) {
                 holder.open(hash: model.requestedSettingsHash)
             }
+            .onChange(of: model.settingsReloadRequestID) {
+                holder.reload(hash: model.requestedSettingsHash)
+            }
             .onChange(of: model.isLoggedIn) {
                 if model.isLoggedIn {
                     // The session changed under us (sign-in in the main window);
@@ -72,11 +75,18 @@ private final class SettingsNavigationDelegate: NSObject, WKNavigationDelegate, 
     ) {
         guard message.name == Injection.settingsNavigationHandlerName,
               let body = message.body as? [String: Any],
-              body["type"] as? String == "openMainWindow",
+              let type = body["type"] as? String,
               let value = body["url"] as? String,
               let url = URL(string: value) else { return }
         Task { @MainActor [weak self] in
-            self?.openInMainWindow?(url)
+            switch type {
+            case "openMainWindow":
+                self?.openInMainWindow?(url)
+            case "openExternal":
+                NSWorkspace.shared.open(url)
+            default:
+                break
+            }
         }
     }
 
@@ -86,20 +96,40 @@ private final class SettingsNavigationDelegate: NSObject, WKNavigationDelegate, 
         decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void
     ) {
         Task { @MainActor [weak self] in
-            guard navigationAction.navigationType == .linkActivated,
-                  let url = navigationAction.request.url,
+            guard let url = navigationAction.request.url,
                   let host = url.host() else {
                 decisionHandler(.allow)
                 return
             }
 
             let isChatGPT = host == "chatgpt.com" || host.hasSuffix(".chatgpt.com")
+            let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? true
+            let providerURL = url.absoluteString.lowercased()
+            if isChatGPT && (providerURL.contains("linkedin") || providerURL.contains("github")) {
+                NSWorkspace.shared.open(url)
+                decisionHandler(.cancel)
+                return
+            }
+
+            if !isChatGPT && isMainFrame {
+                NSWorkspace.shared.open(url)
+                decisionHandler(.cancel)
+                return
+            }
+
+            guard navigationAction.navigationType == .linkActivated else {
+                decisionHandler(.allow)
+                return
+            }
+
+            let settingsURL = url.absoluteString.lowercased()
             let isSettingsLink = url.fragment?.lowercased().hasPrefix("settings") == true
+                || settingsURL.contains("settings")
+                || settingsURL.contains("billing")
+                || settingsURL.contains("invoice")
+                || settingsURL.contains("subscription")
             if isChatGPT && !isSettingsLink {
                 self?.openInMainWindow?(url)
-                decisionHandler(.cancel)
-            } else if !isChatGPT {
-                NSWorkspace.shared.open(url)
                 decisionHandler(.cancel)
             } else {
                 decisionHandler(.allow)
@@ -108,12 +138,39 @@ private final class SettingsNavigationDelegate: NSObject, WKNavigationDelegate, 
     }
 }
 
+private final class SettingsUIDelegate: NSObject, WKUIDelegate {
+    nonisolated func webView(
+        _ webView: WKWebView,
+        runOpenPanelWith parameters: WKOpenPanelParameters,
+        initiatedByFrame frame: WKFrameInfo,
+        completionHandler: @escaping @MainActor ([URL]?) -> Void
+    ) {
+        Task { @MainActor in
+            presentOpenPanel(for: webView, parameters: parameters, completionHandler: completionHandler)
+        }
+    }
+
+    nonisolated func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
+        MainActor.assumeIsolated {
+            if let url = navigationAction.request.url {
+                NSWorkspace.shared.open(url)
+            }
+        }
+        return nil
+    }
+}
+
 @Observable
 @MainActor
 private final class SettingsWebViewHolder {
     let webView: WKWebView
     private var hasLoaded = false
-    private let uiDelegate = FileUploadUIDelegate()
+    private let uiDelegate = SettingsUIDelegate()
     private let navigationDelegate: SettingsNavigationDelegate
 
     init() {
@@ -143,7 +200,13 @@ private final class SettingsWebViewHolder {
         webView.addSubview(dragRegion, positioned: .above, relativeTo: nil)
         NSLayoutConstraint.activate([
             dragRegion.leadingAnchor.constraint(equalTo: webView.leadingAnchor, constant: 84),
-            dragRegion.trailingAnchor.constraint(equalTo: webView.trailingAnchor),
+            // Stop at the nav column's edge: detail views (e.g. Billing's
+            // invoice list) place a back button at the top of the content
+            // panel, and the overlay would swallow clicks on it.
+            dragRegion.trailingAnchor.constraint(
+                equalTo: webView.leadingAnchor,
+                constant: Injection.settingsSidebarWidth
+            ),
             dragRegion.topAnchor.constraint(equalTo: webView.topAnchor),
             dragRegion.heightAnchor.constraint(equalToConstant: 36),
         ])

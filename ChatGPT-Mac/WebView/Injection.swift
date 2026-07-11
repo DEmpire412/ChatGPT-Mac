@@ -265,27 +265,128 @@ enum Injection {
             window.__cgptSettingsNavigationInstalled = true;
 
             function isSettingsURL(url) {
-                return url.origin === location.origin
-                    && (url.hash || '').toLowerCase().indexOf('#settings') === 0;
+                if (url.origin !== location.origin) { return false; }
+                var value = url.href.toLowerCase();
+                return (url.hash || '').toLowerCase().indexOf('#settings') === 0
+                    || value.indexOf('settings') !== -1
+                    || value.indexOf('billing') !== -1
+                    || value.indexOf('invoice') !== -1
+                    || value.indexOf('subscription') !== -1;
             }
 
-            function openInMainWindow(value) {
-                var url;
-                try { url = new URL(value, location.href); } catch (e) { return false; }
-                if (url.origin !== location.origin || isSettingsURL(url)) { return false; }
+            function isBuilderProfileProviderURL(url) {
+                if (url.origin !== location.origin) { return false; }
+                var value = url.href.toLowerCase();
+                return value.indexOf('linkedin') !== -1 || value.indexOf('github') !== -1;
+            }
+
+            function postNavigation(type, url) {
                 try {
                     window.webkit.messageHandlers.\(settingsNavigationHandlerName)
-                        .postMessage({ type: 'openMainWindow', url: url.href });
+                        .postMessage({ type: type, url: url.href });
                     return true;
                 } catch (e) {
                     return false;
                 }
             }
 
+            function openExternal(value) {
+                var url;
+                try { url = new URL(value, location.href); } catch (e) { return false; }
+                if (!isBuilderProfileProviderURL(url)) { return false; }
+                return postNavigation('openExternal', url);
+            }
+
+            function openInMainWindow(value) {
+                var url;
+                try { url = new URL(value, location.href); } catch (e) { return false; }
+                if (url.origin !== location.origin || isSettingsURL(url)) { return false; }
+                return postNavigation('openMainWindow', url);
+            }
+
+            function clickSettingsTab(name) {
+                var wanted = (name || '').toLowerCase();
+                var candidates = [];
+                document.querySelectorAll('div[role="dialog"]').forEach(function (dialog) {
+                    dialog.querySelectorAll('[role="tab"], [role="tablist"] button, nav button, nav a')
+                        .forEach(function (tab) { candidates.push(tab); });
+                });
+                var target = candidates.find(function (tab) {
+                    return (tab.textContent || '').trim().toLowerCase() === wanted;
+                }) || candidates.find(function (tab) {
+                    return (tab.textContent || '').trim().toLowerCase().indexOf(wanted) !== -1;
+                });
+                if (!target) { return false; }
+                target.click();
+                return true;
+            }
+
+            // Billing's invoice list is an in-tab detail view. Clicking the
+            // already-selected Billing tab does not remount it, so reset via
+            // another tab before returning to Billing.
+            function resetBillingTab() {
+                var resetTab = ['General', 'Notifications', 'Personalization'].find(function (name) {
+                    return clickSettingsTab(name);
+                });
+                if (!resetTab) { return false; }
+                setTimeout(function () {
+                    if (!clickSettingsTab('Billing')) {
+                        location.hash = '#settings/Billing';
+                    }
+                }, 50);
+                return true;
+            }
+
+            function isInvoicesViewVisible() {
+                return Array.from(document.querySelectorAll(
+                    '.cgpt-settings-panel, [role="tabpanel"]'
+                )).some(function (panel) {
+                    var panelRect = panel.getBoundingClientRect();
+                    return Array.from(panel.querySelectorAll(
+                        'h1, h2, h3, [role="heading"]'
+                    )).some(function (heading) {
+                        var headingRect = heading.getBoundingClientRect();
+                        return heading.getClientRects().length > 0
+                            && (heading.textContent || '').trim().toLowerCase() === 'invoices'
+                            && headingRect.top < panelRect.top + 120;
+                    });
+                });
+            }
+
+            function isInvoicesBackControl(event) {
+                if (!event.target || !event.target.closest) { return false; }
+                var control = event.target.closest('button, a[href], [role="button"]');
+                var panel = event.target.closest('.cgpt-settings-panel, [role="tabpanel"]');
+                if (!control || !panel) { return false; }
+                if ((panel.textContent || '').toLowerCase().indexOf('invoices') === -1) { return false; }
+
+                var label = (
+                    control.getAttribute('aria-label')
+                    || control.getAttribute('title')
+                    || control.textContent
+                    || ''
+                ).trim().toLowerCase();
+                var hasBackLabel = label === 'back' || label.indexOf('back') !== -1 || label.length === 0;
+                if (!hasBackLabel || !control.querySelector('svg')) { return false; }
+
+                var controlRect = control.getBoundingClientRect();
+                var panelRect = panel.getBoundingClientRect();
+                return controlRect.top < panelRect.top + 96
+                    && controlRect.left < panelRect.left + 96;
+            }
+
             document.addEventListener('click', function (event) {
                 if (!event.target || !event.target.closest) { return; }
+                if (isInvoicesBackControl(event)) {
+                    setTimeout(function () {
+                        if (isInvoicesViewVisible() && !resetBillingTab()) {
+                            location.hash = '#settings/Billing';
+                        }
+                    }, 250);
+                }
+
                 var link = event.target.closest('a[href]');
-                if (!link || !openInMainWindow(link.href)) { return; }
+                if (!link || !(openExternal(link.href) || openInMainWindow(link.href))) { return; }
                 event.preventDefault();
                 event.stopImmediatePropagation();
             }, true);
@@ -294,12 +395,18 @@ enum Injection {
                 var original = history[name];
                 history[name] = function () {
                     if (arguments.length > 2 && arguments[2] != null
-                        && openInMainWindow(arguments[2])) {
+                        && (openExternal(arguments[2]) || openInMainWindow(arguments[2]))) {
                         return;
                     }
                     return original.apply(this, arguments);
                 };
             });
+
+            var originalOpen = window.open;
+            window.open = function (value) {
+                if (value != null && openExternal(value)) { return null; }
+                return originalOpen.apply(this, arguments);
+            };
         })();
         """
         return userScripts + [
