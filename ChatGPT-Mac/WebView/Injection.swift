@@ -204,8 +204,8 @@ enum Injection {
         \(hide) {
             display: none !important;
         }
-        /* Native glass shows through: page shell and sidebar are transparent,
-           while the chat column keeps the site's own opaque surface color. */
+        /* Native backing shows through: page shell, sidebar, and chat column
+           are transparent so SwiftUI owns the window background. */
         html, body, body > div, #__next, #root {
             background-color: transparent !important;
             background-image: none !important;
@@ -213,24 +213,31 @@ enum Injection {
         :root {
             --sidebar-surface-primary: transparent !important;
         }
-        /* The site's dark theme is pitch black, but its --main-surface-primary
-           token (and the Canvas fallback) is still a lighter gray; pin it to
-           black so the chat surface never shifts tone. */
+        /* Keep the site's dark surface token pitch black for dialogs and
+           overlays that still need an opaque web-painted background. */
         html.dark,
         html[data-theme="dark"] {
             --main-surface-primary: #000 !important;
         }
         html.dark main,
-        html[data-theme="dark"] main {
-            background-color: #000 !important;
+        html.dark #thread,
+        html.dark main > div,
+        html[data-theme="dark"] main,
+        html[data-theme="dark"] #thread,
+        html[data-theme="dark"] main > div {
+            background-color: transparent !important;
+            background-image: none !important;
         }
         \(sidebar),
         \(sidebarChildren) {
             background-color: transparent !important;
             background-image: none !important;
         }
-        main {
-            background-color: var(--main-surface-primary, Canvas) !important;
+        main,
+        #thread,
+        main > div {
+            background-color: transparent !important;
+            background-image: none !important;
         }
         /* Native sidebar collapse: __cgptToggleSidebar toggles this class on <html>. */
         \(webSidebarSelectors.map { "html.cgpt-hide-sidebar \($0)" }.joined(separator: ",\n")) {
