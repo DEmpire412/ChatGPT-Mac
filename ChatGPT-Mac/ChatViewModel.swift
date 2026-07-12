@@ -81,9 +81,42 @@ final class ChatViewModel: NSObject {
         if webView.url == nil {
             webView.load(URLRequest(url: Injection.homeURL))
         } else {
-            webView.reload()
+            webView.reloadFromOrigin()
         }
         settingsReloadRequestID += 1
+    }
+
+    /// Clears ChatGPT/OpenAI website data from WebKit's persistent app store.
+    /// This recovers from corrupted service worker, cache, IndexedDB, or session state
+    /// that a normal reload or app relaunch preserves.
+    func resetWebsiteData() {
+        webView.stopLoading()
+
+        let store = WKWebsiteDataStore.default()
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        let matchingDomains = [
+            "chatgpt.com",
+            "chat.openai.com",
+            "openai.com",
+            "auth.openai.com",
+            "oaistatic.com",
+            "oaiusercontent.com",
+        ]
+
+        store.fetchDataRecords(ofTypes: dataTypes) { [weak self] records in
+            let chatGPTRecords = records.filter { record in
+                let name = record.displayName.lowercased()
+                return matchingDomains.contains { domain in
+                    name == domain || name.hasSuffix("." + domain) || name.contains(domain)
+                }
+            }
+
+            store.removeData(ofTypes: dataTypes, for: chatGPTRecords) { [weak self] in
+                guard let self else { return }
+                self.webView.load(URLRequest(url: Injection.homeURL))
+                self.settingsReloadRequestID += 1
+            }
+        }
     }
 
     func goHome() {
@@ -284,6 +317,12 @@ extension ChatViewModel: WKNavigationDelegate, WKUIDelegate {
             if chatTextZoom != 1.0 {
                 applyTextZoom()
             }
+        }
+    }
+
+    nonisolated func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Task { @MainActor in
+            webView.reloadFromOrigin()
         }
     }
 

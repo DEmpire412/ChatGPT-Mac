@@ -57,6 +57,10 @@ struct ChatGPT_MacApp: App {
                 }
                 .keyboardShortcut("h", modifiers: [.command, .shift])
 
+                Button("Reset ChatGPT Website Data") {
+                    model.resetWebsiteData()
+                }
+
                 Divider()
 
                 // "=" so plain ⌘ and the +/= key works without shift.
