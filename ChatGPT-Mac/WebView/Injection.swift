@@ -555,23 +555,23 @@ enum Injection {
             box-shadow: none !important;
             background-color: var(--main-surface-primary, Canvas) !important;
         }
-        /* Frosted backing for the sidebar's sticky header (logo, New chat,
-           Search chats). The bridge script maintains a single .cgpt-frost-overlay
-           spanning from the sidebar top down to the last sticky row, layered
-           above the scrolling entries (z 4) but below the header rows (z 5),
-           and toggles .cgpt-scrolled while the list is scrolled. */
-        .cgpt-frost-overlay {
+        /* Transparent shelf for the sidebar's sticky header (logo, New chat,
+           Search chats). The bridge script keeps web sidebar controls hidden
+           while they pass underneath this region, leaving the native translucent
+           sidebar material visible instead of painting a web-colored cover. */
+        .cgpt-header-shelf {
             position: fixed;
             pointer-events: none;
             z-index: 4;
             opacity: 0;
             transition: opacity 0.15s ease;
-            background-color: color-mix(in srgb, Canvas 35%, transparent);
-            -webkit-backdrop-filter: blur(24px);
-            backdrop-filter: blur(24px);
+            background-color: transparent;
         }
-        \(webSidebarSelectors.map { "\($0).cgpt-scrolled .cgpt-frost-overlay" }.joined(separator: ",\n")) {
+        \(webSidebarSelectors.map { "\($0).cgpt-scrolled .cgpt-header-shelf" }.joined(separator: ",\n")) {
             opacity: 1;
+        }
+        .cgpt-hidden-under-shelf {
+            visibility: hidden !important;
         }
         \(webSidebarSelectors.map { "\($0) .cgpt-sticky" }.joined(separator: ",\n")) {
             z-index: 5 !important;
@@ -637,9 +637,31 @@ enum Injection {
 
             // Tags every position:sticky element in the sidebar with .cgpt-sticky
             // and toggles .cgpt-scrolled on the sidebar root while its scroll
-            // container is scrolled, driving the frosted-header CSS.
+            // container is scrolled, driving the sticky-header shelf CSS.
             const SIDEBAR_ROOTS = ['\#(webSidebarSelectors.joined(separator: "', '"))'];
-            function updateSidebarFrost() {
+
+            function updateShelfOcclusion(sidebar, shelfBottom, active) {
+                sidebar.querySelectorAll('.cgpt-hidden-under-shelf').forEach(function (el) {
+                    el.classList.remove('cgpt-hidden-under-shelf');
+                });
+                if (!active || shelfBottom <= 0) { return; }
+
+                const sidebarRect = sidebar.getBoundingClientRect();
+                const top = sidebarRect.top;
+                const occlusionBottom = shelfBottom + 8;
+                const candidates = 'a, button, [role="button"], [role="link"], [role="heading"], h1, h2, h3, h4, p, span, div, svg, path, [class*="icon"], [class*="chevron"]';
+                sidebar.querySelectorAll(candidates).forEach(function (el) {
+                    if (el.classList.contains('cgpt-sticky') || el.closest('.cgpt-sticky')) { return; }
+                    const rect = el.getBoundingClientRect();
+                    if (rect.width <= 0 || rect.height <= 0) { return; }
+                    if (rect.height > 72 || rect.width > sidebarRect.width * 0.98) { return; }
+                    if (rect.bottom > top && rect.top < occlusionBottom) {
+                        el.classList.add('cgpt-hidden-under-shelf');
+                    }
+                });
+            }
+
+            function updateSidebarShelf() {
                 let sidebar = null;
                 for (const sel of SIDEBAR_ROOTS) {
                     sidebar = document.querySelector(sel);
@@ -647,13 +669,13 @@ enum Injection {
                 }
                 if (!sidebar) { return; }
                 let scroller = null;
-                let frostBottom = 0;
+                let shelfBottom = 0;
                 const sidebarRect = sidebar.getBoundingClientRect();
                 sidebar.querySelectorAll('*').forEach(function (el) {
                     const cs = getComputedStyle(el);
                     if (cs.position === 'sticky') {
                         el.classList.add('cgpt-sticky');
-                        frostBottom = Math.max(frostBottom, el.getBoundingClientRect().bottom);
+                        shelfBottom = Math.max(shelfBottom, el.getBoundingClientRect().bottom);
                     }
                     if (!scroller && el.scrollHeight > el.clientHeight + 4
                         && /(auto|scroll|overlay)/.test(cs.overflowY)) {
@@ -661,33 +683,45 @@ enum Injection {
                     }
                 });
 
-                // One continuous frosted sheet from the sidebar top to the last
-                // sticky row, instead of per-row backgrounds with gaps.
-                let overlay = sidebar.querySelector('.cgpt-frost-overlay');
-                if (frostBottom > 0) {
+                // One continuous shelf from the sidebar top to the last sticky
+                // row, instead of per-row backgrounds with gaps.
+                let overlay = sidebar.querySelector('.cgpt-header-shelf');
+                if (shelfBottom > 0) {
                     if (!overlay) {
                         overlay = document.createElement('div');
-                        overlay.className = 'cgpt-frost-overlay';
+                        overlay.className = 'cgpt-header-shelf';
                         sidebar.appendChild(overlay);
                     }
                     overlay.style.top = sidebarRect.top + 'px';
                     overlay.style.left = sidebarRect.left + 'px';
                     overlay.style.width = sidebarRect.width + 'px';
-                    overlay.style.height = (frostBottom - sidebarRect.top) + 'px';
+                    overlay.style.height = (shelfBottom - sidebarRect.top) + 'px';
                 } else if (overlay) {
                     overlay.remove();
                 }
 
-                if (scroller && !scroller.__cgptFrostBound) {
-                    scroller.__cgptFrostBound = true;
-                    const update = function () {
-                        sidebar.classList.toggle('cgpt-scrolled', scroller.scrollTop > 2);
+                if (scroller) {
+                    scroller.__cgptShelfUpdate = function () {
+                        const scrolled = scroller.scrollTop > 2;
+                        sidebar.classList.toggle('cgpt-scrolled', scrolled);
+                        updateShelfOcclusion(sidebar, shelfBottom, scrolled);
                     };
-                    scroller.addEventListener('scroll', update, { passive: true });
-                    update();
+                    if (!scroller.__cgptShelfBound) {
+                        scroller.__cgptShelfBound = true;
+                        scroller.addEventListener('scroll', function () {
+                            if (!scroller.__cgptShelfUpdate) { return; }
+                            scroller.__cgptShelfUpdate();
+                            requestAnimationFrame(function () {
+                                if (scroller.__cgptShelfUpdate) { scroller.__cgptShelfUpdate(); }
+                            });
+                        }, { passive: true });
+                    }
+                    scroller.__cgptShelfUpdate();
+                } else {
+                    updateShelfOcclusion(sidebar, shelfBottom, false);
                 }
             }
-            window.addEventListener('resize', function () { setTimeout(updateSidebarFrost, 100); });
+            window.addEventListener('resize', function () { setTimeout(updateSidebarShelf, 100); });
 
             function findSidebar() {
                 for (const sel of SIDEBAR_ROOTS) {
@@ -709,7 +743,7 @@ enum Injection {
                 if (rect.width < 50) { return; }
                 const nodes = [sidebar].concat(Array.from(sidebar.querySelectorAll('*')));
                 for (const el of nodes) {
-                    if (el.classList && el.classList.contains('cgpt-frost-overlay')) { continue; }
+                    if (el.classList && el.classList.contains('cgpt-header-shelf')) { continue; }
                     const r = el.getBoundingClientRect();
                     if (r.width < rect.width * 0.8 || r.height < rect.height * 0.5) { continue; }
                     const bg = getComputedStyle(el).backgroundColor;
@@ -748,7 +782,7 @@ enum Injection {
             function report() {
                 ensureSidebarOpen();
                 clearSidebarBackgrounds();
-                updateSidebarFrost();
+                updateSidebarShelf();
                 const loggedOut = !!document.querySelector(LOGGED_OUT_PROBE);
                 const loggedIn = !loggedOut && !!document.querySelector(LOGGED_IN_PROBE);
                 const shareButton = document.querySelector('\#(shareButtonSelector)');
