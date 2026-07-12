@@ -47,8 +47,10 @@ enum Injection {
     static let conversationMenuSelector = "[data-testid=\"conversation-options-button\"]"
     static let temporaryChatSelector = "[data-testid=\"temporary-chat-button\"], button[aria-label*=\"temporary\" i]"
 
-    /// Elements that indicate a signed-in app shell.
-    static let loggedInProbe = "#prompt-textarea, form [contenteditable=\"true\"], main form textarea"
+    /// Elements that indicate a signed-in app shell. Alternate routes such as
+    /// GPTs, Library, Projects, and Plugins do not always mount the composer,
+    /// so include persistent signed-in navigation/account affordances too.
+    static let loggedInProbe = "#prompt-textarea, form [contenteditable=\"true\"], main form textarea, [data-testid=\"left-sidebar\"], nav[aria-label=\"Chat history\"], a[href=\"/library\"], a[href=\"/gpts\"], button[aria-label*=\"profile\" i], button[aria-label*=\"account\" i], [data-testid*=\"profile\" i], [data-testid*=\"account\" i]"
     /// Elements that indicate the logged-out marketing/login page.
     static let loggedOutProbe = "[data-testid=\"login-button\"], [data-testid=\"signup-button\"]"
 
@@ -88,15 +90,15 @@ enum Injection {
         return userScripts + [WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true)]
     }
 
-    /// Width of the settings dialog's nav column, aligned with the native glass panel.
-    static let settingsSidebarWidth: CGFloat = 240
+    /// Width of the settings dialog's nav column, aligned with the main native glass panel.
+    static let settingsSidebarWidth: CGFloat = SidebarView.width
 
-    /// Scripts for the native Settings window: hides the app shell so only the
+    /// Scripts for the native Settings window: hides duplicated app chrome so only the
     /// settings dialog is visible, stretched to fill the window. Mirrors the main
     /// window's treatment: the dialog's nav column is transparent (native glass
     /// shows through), while the content pane keeps an opaque surface.
     static var settingsWindowUserScripts: [WKUserScript] {
-        let hideShell = (webSidebarSelectors + ["#page-header", "main"]).joined(separator: ", ")
+        let hideShell = (webSidebarSelectors + ["#page-header"]).joined(separator: ", ")
         let navWidth = Int(settingsSidebarWidth)
         let css = """
         \(hideShell) { display: none !important; } \
@@ -111,8 +113,11 @@ enum Injection {
         background-color: transparent !important; background-image: none !important; \
         padding-top: 20px !important; \
         width: \(navWidth)px !important; min-width: \(navWidth)px !important; max-width: \(navWidth)px !important; } \
+        main { visibility: hidden !important; } \
         .cgpt-settings-panel { \
-        background-color: var(--main-surface-primary, Canvas) !important; }
+        background-color: var(--main-surface-primary, Canvas) !important; } \
+        [data-radix-popper-content-wrapper], [role="listbox"], [role="menu"] { \
+        visibility: visible !important; z-index: 2147483647 !important; pointer-events: auto !important; }
         """
         let styleSource = """
         (function () {
@@ -124,6 +129,23 @@ enum Injection {
                 style.id = 'cgpt-settings-style';
                 style.textContent = '\(css)';
                 (document.head || document.documentElement).appendChild(style);
+            }
+
+            function clearSettingsNavBackgrounds(nav) {
+                var navRect = nav.getBoundingClientRect();
+                if (navRect.width < 40 || navRect.height < 40) { return; }
+                var nodes = Array.from(nav.querySelectorAll('*'));
+                nodes.forEach(function (el) {
+                    var rect = el.getBoundingClientRect();
+                    var coversNav = rect.width >= navRect.width * 0.85
+                        && rect.height >= navRect.height * 0.5;
+                    if (!coversNav) { return; }
+                    el.style.setProperty('background-color', 'transparent', 'important');
+                    el.style.setProperty('background-image', 'none', 'important');
+                    el.style.setProperty('box-shadow', 'none', 'important');
+                    el.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+                    el.style.setProperty('backdrop-filter', 'none', 'important');
+                });
             }
 
             // Only the outer settings dialog should fill this native window.
@@ -170,6 +192,7 @@ enum Injection {
                 root.querySelectorAll('[role="tablist"], nav').forEach(function (nav) {
                     if (nav.closest('div[role="dialog"]') === root) {
                         nav.classList.add('cgpt-settings-nav');
+                        clearSettingsNavBackgrounds(nav);
                     }
                 });
                 root.querySelectorAll('[role="tabpanel"]').forEach(function (panel) {
@@ -433,12 +456,14 @@ enum Injection {
         }
         :root {
             --sidebar-surface-primary: transparent !important;
+            --cgpt-native-main-surface: rgb(247 247 248);
         }
         /* Keep the site's dark surface token pitch black for dialogs and
            overlays that still need an opaque web-painted background. */
         html.dark,
         html[data-theme="dark"] {
             --main-surface-primary: #000 !important;
+            --cgpt-native-main-surface: #000;
         }
         html.dark main,
         html.dark #thread,
@@ -458,6 +483,30 @@ enum Injection {
         #thread,
         main > div {
             background-color: transparent !important;
+            background-image: none !important;
+        }
+        /* Route shells such as the GPT store add their own full-page surface
+           wrappers. Clear only page-sized structural layers so native SwiftUI
+           remains the sole window background, without flattening controls,
+           cards, menus, or dialogs that need their own fill. */
+        main [class*="bg-token-main-surface-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
+        main [class*="bg-token-bg-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
+        main [class*="bg-token-sidebar-surface-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
+        main .bg-white:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
+        main .dark\\:bg-gray-950:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
+        main .min-h-screen,
+        main .h-screen,
+        main .h-full,
+        main .min-h-full,
+        main header:not([role="dialog"]),
+        main [role="banner"]:not([role="dialog"]) {
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+        /* Sticky in-page headers (for example, GPT store search and tabs) need
+           an opaque mask so scrolled cards do not show through the controls. */
+        main .sticky:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]) {
+            background-color: var(--cgpt-native-main-surface) !important;
             background-image: none !important;
         }
         /* Native sidebar collapse: __cgptToggleSidebar toggles this class on <html>. */
@@ -750,33 +799,81 @@ enum Injection {
             for (const fn of ['pushState', 'replaceState']) {
                 const original = history[fn];
                 history[fn] = function () {
+                    if (arguments.length > 2) {
+                        const tab = settingsTabForValue(String(arguments[2] || ''));
+                        if (tab && !document.querySelector(LOGGED_OUT_PROBE)) {
+                            post({ type: 'openSettings', tab: tab });
+                            scheduleReport();
+                            return;
+                        }
+                    }
                     const result = original.apply(this, arguments);
                     scheduleReport();
                     return result;
                 };
             }
             window.addEventListener('popstate', scheduleReport);
+            window.addEventListener('hashchange', function () {
+                const tab = settingsTabForValue(location.hash || '');
+                if (tab && !document.querySelector(LOGGED_OUT_PROBE)
+                    && !document.getElementById('cgpt-settings-style')) {
+                    post({ type: 'openSettings', tab: tab });
+                }
+                scheduleReport();
+            });
             setInterval(report, 3000);
             report();
 
             // Route the profile menu's Settings / Personalization items to the
-            // native settings window instead of the inline web dialog.
-            document.addEventListener('click', function (e) {
-                if (!e.target || !e.target.closest) { return; }
-                // Menu items (profile menu) plus plain buttons/links, so the
-                // logged-out sidebar's "Settings" entry is routed natively too.
-                const item = e.target.closest('[role="menuitem"], button, a');
-                if (!item || item.closest('div[role="dialog"]')) { return; }
-                const label = (item.textContent || '').trim().toLowerCase();
-                if (label === 'settings' || label === 'personalization') {
-                    // Logged out, the site's own settings popover is used
-                    // instead of the native window.
-                    if (document.querySelector(LOGGED_OUT_PROBE)) { return; }
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    post({ type: 'openSettings', tab: label });
-                    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            // native settings window instead of the inline web dialog. Different
+            // routes render the account menu with different roles/labels, so use
+            // hrefs and accessible labels in addition to visible text.
+            function controlLabel(el) {
+                return (
+                    el.getAttribute('aria-label')
+                    || el.getAttribute('title')
+                    || el.textContent
+                    || ''
+                ).trim().replace(/\s+/g, ' ').toLowerCase();
+            }
+
+            function settingsTabForValue(value) {
+                const text = (value || '').toLowerCase();
+                if (text.indexOf('personalization') !== -1) { return 'personalization'; }
+                if (text.indexOf('settings') !== -1) { return 'settings'; }
+                return '';
+            }
+
+            function settingsTabForControl(el) {
+                const label = controlLabel(el);
+                const href = el.getAttribute('href') || '';
+                const tab = settingsTabForValue(href + ' ' + label);
+                if (tab) { return tab; }
+                if (label === 'settings'
+                    || label.startsWith('settings ')
+                    || label.indexOf(' settings') !== -1) {
+                    return 'settings';
                 }
+                return '';
+            }
+
+            document.addEventListener('click', function (e) {
+                if (document.getElementById('cgpt-settings-style')) { return; }
+                if (!e.target || !e.target.closest) { return; }
+                const item = e.target.closest(
+                    '[role="menuitem"], [role="menuitemradio"], [role="option"], '
+                    + '[data-testid*="settings" i], button, a[href]'
+                );
+                if (!item || item.closest('div[role="dialog"]')) { return; }
+                const tab = settingsTabForControl(item);
+                if (!tab) { return; }
+                // Logged out, the site's own settings popover is used instead
+                // of the native window.
+                if (document.querySelector(LOGGED_OUT_PROBE)) { return; }
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                post({ type: 'openSettings', tab: tab });
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
             }, true);
 
             // --- Helpers called from Swift ---
