@@ -64,7 +64,15 @@ final class ChatViewModel: NSObject {
         )
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.load(URLRequest(url: Injection.homeURL))
+        loadFreshHome()
+    }
+
+    private func loadFreshHome() {
+        webView.load(Injection.freshRequest(for: Injection.homeURL))
+    }
+
+    private func loadFreshURL(_ url: URL) {
+        webView.load(Injection.freshRequest(for: url))
     }
 
     // MARK: - Actions
@@ -72,14 +80,14 @@ final class ChatViewModel: NSObject {
     func newChat() {
         webView.evaluateJavaScript("window.__cgptNewChat && window.__cgptNewChat()") { [weak self] result, _ in
             if (result as? Bool) != true {
-                self?.webView.load(URLRequest(url: Injection.homeURL))
+                self?.loadFreshHome()
             }
         }
     }
 
     func reload() {
         if webView.url == nil {
-            webView.load(URLRequest(url: Injection.homeURL))
+            loadFreshHome()
         } else {
             webView.reloadFromOrigin()
         }
@@ -91,6 +99,7 @@ final class ChatViewModel: NSObject {
     /// that a normal reload or app relaunch preserves.
     func resetWebsiteData() {
         webView.stopLoading()
+        webView.loadHTMLString("", baseURL: nil)
 
         let store = WKWebsiteDataStore.default()
         let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
@@ -113,14 +122,14 @@ final class ChatViewModel: NSObject {
 
             store.removeData(ofTypes: dataTypes, for: chatGPTRecords) { [weak self] in
                 guard let self else { return }
-                self.webView.load(URLRequest(url: Injection.homeURL))
+                self.loadFreshHome()
                 self.settingsReloadRequestID += 1
             }
         }
     }
 
     func goHome() {
-        webView.load(URLRequest(url: Injection.homeURL))
+        loadFreshHome()
     }
 
     /// Navigates the persistent chat web view and brings its window forward.
@@ -128,7 +137,7 @@ final class ChatViewModel: NSObject {
     func openInMainWindow(_ url: URL) {
         guard let host = url.host(),
               host == "chatgpt.com" || host.hasSuffix(".chatgpt.com") else { return }
-        webView.load(URLRequest(url: url))
+        loadFreshURL(url)
         NSApp.activate(ignoringOtherApps: true)
         webView.window?.makeKeyAndOrderFront(nil)
     }
@@ -368,7 +377,7 @@ extension ChatViewModel: WKNavigationDelegate, WKUIDelegate {
     ) -> WKWebView? {
         MainActor.assumeIsolated {
             if let url = navigationAction.request.url {
-                webView.load(URLRequest(url: url))
+                loadFreshURL(url)
             }
         }
         return nil

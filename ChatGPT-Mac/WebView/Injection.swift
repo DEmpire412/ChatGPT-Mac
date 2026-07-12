@@ -13,6 +13,18 @@ enum Injection {
     static let homeURL = URL(string: "https://chatgpt.com/")!
     /// Deep link that opens the settings dialog in the web app.
     static let settingsURL = URL(string: "https://chatgpt.com/#settings/General")!
+
+    static func freshRequest(for url: URL) -> URLRequest {
+        var request = URLRequest(
+            url: url,
+            cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
+            timeoutInterval: 60
+        )
+        request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        request.setValue("no-cache", forHTTPHeaderField: "Pragma")
+        return request
+    }
+
     static let messageHandlerName = "bridge"
     static let settingsNavigationHandlerName = "settingsNavigation"
 

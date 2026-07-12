@@ -64,7 +64,7 @@ struct FloatingChatView: View {
             .help("Open in main window")
 
             Button {
-                holder.webView.load(URLRequest(url: Injection.homeURL))
+                holder.webView.load(Injection.freshRequest(for: Injection.homeURL))
             } label: {
                 Image(systemName: "square.and.pencil")
                     .font(.system(size: 14, weight: .medium))
@@ -81,7 +81,7 @@ struct FloatingChatView: View {
 
     private func openInMainWindow() {
         let target = holder.webView.url ?? url
-        model.webView.load(URLRequest(url: target))
+        model.openInMainWindow(target)
         NSApp.activate()
         model.webView.window?.makeKeyAndOrderFront(nil)
         dismiss()
@@ -143,6 +143,6 @@ private final class FloatingWebViewHolder {
     func loadIfNeeded(_ url: URL) {
         guard !hasLoaded else { return }
         hasLoaded = true
-        webView.load(URLRequest(url: url))
+        webView.load(Injection.freshRequest(for: url))
     }
 }

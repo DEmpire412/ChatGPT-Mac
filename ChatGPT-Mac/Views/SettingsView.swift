@@ -73,12 +73,12 @@ private final class SettingsNavigationDelegate: NSObject, WKNavigationDelegate, 
         _ userContentController: WKUserContentController,
         didReceive message: WKScriptMessage
     ) {
-        guard message.name == Injection.settingsNavigationHandlerName,
-              let body = message.body as? [String: Any],
-              let type = body["type"] as? String,
-              let value = body["url"] as? String,
-              let url = URL(string: value) else { return }
         Task { @MainActor [weak self] in
+            guard message.name == Injection.settingsNavigationHandlerName,
+                  let body = message.body as? [String: Any],
+                  let type = body["type"] as? String,
+                  let value = body["url"] as? String,
+                  let url = URL(string: value) else { return }
             switch type {
             case "openMainWindow":
                 self?.openInMainWindow?(url)
@@ -252,6 +252,7 @@ private final class SettingsWebViewHolder {
     /// Full page load, picking up the current session's cookies.
     func reload(hash: String) {
         hasLoaded = true
-        webView.load(URLRequest(url: URL(string: hash, relativeTo: Injection.homeURL) ?? Injection.settingsURL))
+        let url = URL(string: hash, relativeTo: Injection.homeURL) ?? Injection.settingsURL
+        webView.load(Injection.freshRequest(for: url))
     }
 }
