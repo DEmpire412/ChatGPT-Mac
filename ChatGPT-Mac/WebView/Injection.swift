@@ -444,6 +444,9 @@ enum Injection {
         let hide = webChromeSelectors.joined(separator: ",\n")
         let sidebar = webSidebarSelectors.joined(separator: ",\n")
         let sidebarChildren = webSidebarSelectors.map { "\($0) nav" }.joined(separator: ",\n")
+        let sidebarBoundary = webSidebarSelectors.flatMap { selector in
+            [selector, "\(selector)::before", "\(selector)::after", "\(selector) > *", "\(selector) nav"]
+        }.joined(separator: ",\n")
         return """
         \(hide) {
             display: none !important;
@@ -474,14 +477,25 @@ enum Injection {
             background-color: transparent !important;
             background-image: none !important;
         }
-        \(sidebar),
+        \(sidebar) {
+            background-color: transparent !important;
+            background-image: none !important;
+        }
         \(sidebarChildren) {
             background-color: transparent !important;
             background-image: none !important;
         }
+        \(sidebarBoundary) {
+            border-right: 0 !important;
+            border-inline-end: 0 !important;
+            box-shadow: none !important;
+        }
         main,
         #thread,
         main > div {
+            border-left: 0 !important;
+            border-inline-start: 0 !important;
+            box-shadow: none !important;
             background-color: transparent !important;
             background-image: none !important;
         }
@@ -569,6 +583,13 @@ enum Injection {
                 style.textContent = css;
                 (document.head || document.documentElement).appendChild(style);
             }
+            // Restore the user's sidebar collapse across reloads and relaunches
+            // before first paint, so the sidebar doesn't flash open.
+            try {
+                if (localStorage.getItem('cgpt-sidebar-hidden') === '1') {
+                    document.documentElement.classList.add('cgpt-hide-sidebar');
+                }
+            } catch (e) {}
             install();
             new MutationObserver(install).observe(document.documentElement, { childList: true, subtree: false });
             document.addEventListener('DOMContentLoaded', install);
@@ -911,9 +932,10 @@ enum Injection {
             // rather than relying on the web app's own toggle buttons, whose
             // markup changes too often to click reliably.
             window.__cgptToggleSidebar = function () {
-                document.documentElement.classList.toggle('cgpt-hide-sidebar');
+                const hidden = document.documentElement.classList.toggle('cgpt-hide-sidebar');
+                try { localStorage.setItem('cgpt-sidebar-hidden', hidden ? '1' : '0'); } catch (e) {}
                 report();
-                return true;
+                return hidden;
             };
 
             window.__cgptToggleTemporaryChat = function () {

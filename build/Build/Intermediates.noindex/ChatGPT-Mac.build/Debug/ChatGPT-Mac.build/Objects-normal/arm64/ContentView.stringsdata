@@ -7,7 +7,7 @@
         "key": "Show or hide the sidebar (⌃⌘S)",
         "location": {
           "startingColumn": 35,
-          "startingLine": 51
+          "startingLine": 48
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "New Chat (⌘N)",
         "location": {
           "startingColumn": 31,
-          "startingLine": 59
+          "startingLine": 56
         }
       },
       {
@@ -23,7 +23,7 @@
         "key": "Reload (⌘R)",
         "location": {
           "startingColumn": 31,
-          "startingLine": 66
+          "startingLine": 63
         }
       },
       {
@@ -31,7 +31,7 @@
         "key": "Toggle Sidebar",
         "location": {
           "startingColumn": 39,
-          "startingLine": 49
+          "startingLine": 46
         }
       },
       {
@@ -39,7 +39,7 @@
         "key": "New Chat",
         "location": {
           "startingColumn": 35,
-          "startingLine": 57
+          "startingLine": 54
         }
       },
       {
@@ -47,7 +47,7 @@
         "key": "Reload",
         "location": {
           "startingColumn": 35,
-          "startingLine": 64
+          "startingLine": 61
         }
       },
       {
@@ -55,7 +55,7 @@
         "key": "Mode",
         "location": {
           "startingColumn": 32,
-          "startingLine": 72
+          "startingLine": 69
         }
       },
       {
@@ -63,7 +63,7 @@
         "key": "Switch between Chat and Work",
         "location": {
           "startingColumn": 31,
-          "startingLine": 78
+          "startingLine": 75
         }
       },
       {
@@ -176,14 +176,6 @@
         "location": {
           "startingColumn": 35,
           "startingLine": 160
-        }
-      },
-      {
-        "comment": "",
-        "key": "Sign in to ChatGPT to get started",
-        "location": {
-          "startingColumn": 19,
-          "startingLine": 181
         }
       }
     ]

@@ -377,6 +377,7 @@ SWIFT_CLASS("_TtC11ChatGPT_Mac13ChatViewModel")
 
 @class WKWebView;
 @class WKNavigationAction;
+@class WKNavigation;
 @class WKSecurityOrigin;
 @class WKFrameInfo;
 @class WKOpenPanelParameters;
@@ -385,6 +386,7 @@ SWIFT_CLASS("_TtC11ChatGPT_Mac13ChatViewModel")
 @class WKWindowFeatures;
 @interface ChatViewModel (SWIFT_EXTENSION(ChatGPT_Mac)) <WKNavigationDelegate, WKUIDelegate>
 - (void)webView:(WKWebView * _Nonnull)webView decidePolicyForNavigationAction:(WKNavigationAction * _Nonnull)navigationAction decisionHandler:(void (^ _Nonnull)(WKNavigationActionPolicy))decisionHandler;
+- (void)webView:(WKWebView * _Nonnull)webView didFinishNavigation:(WKNavigation * _Null_unspecified)navigation;
 - (void)webView:(WKWebView * _Nonnull)webView requestMediaCapturePermissionForOrigin:(WKSecurityOrigin * _Nonnull)origin initiatedByFrame:(WKFrameInfo * _Nonnull)frame type:(WKMediaCaptureType)type decisionHandler:(void (^ _Nonnull)(WKPermissionDecision))decisionHandler;
 - (void)webView:(WKWebView * _Nonnull)webView runOpenPanelWithParameters:(WKOpenPanelParameters * _Nonnull)parameters initiatedByFrame:(WKFrameInfo * _Nonnull)frame completionHandler:(void (^ _Nonnull)(NSArray<NSURL *> * _Nullable))completionHandler;
 - (WKWebView * _Nullable)webView:(WKWebView * _Nonnull)webView createWebViewWithConfiguration:(WKWebViewConfiguration * _Nonnull)configuration forNavigationAction:(WKNavigationAction * _Nonnull)navigationAction windowFeatures:(WKWindowFeatures * _Nonnull)windowFeatures SWIFT_WARN_UNUSED_RESULT;

@@ -36,3 +36,4 @@
 /Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Products/Debug/ChatGPT-Mac.app
 /Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Products/Debug/ChatGPT-Mac.app
 /Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Products/Debug/ChatGPT-Mac.app
+/Users/davidempire1/Downloads/ChatGPT-Mac/build/Build/Products/Debug/ChatGPT-Mac.app

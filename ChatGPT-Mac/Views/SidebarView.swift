@@ -16,9 +16,6 @@ struct SidebarView: View {
 
     var body: some View {
         SidebarMaterial()
-            .overlay(alignment: .trailing) {
-                Divider()
-            }
     }
 }
 

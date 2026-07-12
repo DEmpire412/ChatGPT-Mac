@@ -8,6 +8,10 @@
 	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>ChatGPT-Mac</string>
+	<key>CFBundleIconFile</key>
+	<string>ChatGPTIcon</string>
+	<key>CFBundleIconName</key>
+	<string>ChatGPTIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.DavidSaporta.ChatGPT-Mac</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -17,7 +21,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>2026.7.1</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
@@ -40,8 +44,10 @@
 	<string>2700</string>
 	<key>DTXcodeBuild</key>
 	<string>27A5218g</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>27.0</string>
+	<string>26.0</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>ChatGPT voice mode uses the microphone so you can talk to the assistant.</string>
 </dict>
