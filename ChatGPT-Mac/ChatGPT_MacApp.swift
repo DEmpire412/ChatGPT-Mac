@@ -8,12 +8,14 @@ import SwiftUI
 @main
 struct ChatGPT_MacApp: App {
     @State private var model = ChatViewModel()
+    @State private var updater = AppUpdater()
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(model)
+                .environment(updater)
                 .frame(minWidth: 800, minHeight: 520)
                 .containerBackground(.thickMaterial, for: .window)
                 .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
@@ -34,6 +36,16 @@ struct ChatGPT_MacApp: App {
                     }
                 }
                 .keyboardShortcut(",", modifiers: .command)
+
+                Button("Update Settings…") {
+                    openWindow(id: "updates")
+                }
+            }
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") {
+                    updater.checkForUpdates()
+                }
+                .disabled(!updater.canCheckForUpdates)
             }
             CommandGroup(replacing: .newItem) {
                 Button("New Chat") {
@@ -89,6 +101,7 @@ struct ChatGPT_MacApp: App {
             if let url {
                 FloatingChatView(url: url)
                     .environment(model)
+                    .environment(updater)
                     .frame(minWidth: 360, minHeight: 400)
             }
         }
@@ -102,9 +115,17 @@ struct ChatGPT_MacApp: App {
         Window("Settings", id: "settings") {
             SettingsView()
                 .environment(model)
+                .environment(updater)
                 .containerBackground(.thickMaterial, for: .window)
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 920, height: 700)
+
+        Window("Updates", id: "updates") {
+            UpdateSettingsView()
+                .environment(updater)
+        }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 460, height: 280)
     }
 }

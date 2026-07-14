@@ -6,13 +6,30 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A7FD3D303005F519008C41E9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A7FD3D2F3005F519008C41E9 /* Sparkle */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		A77DD9E83000A48D005EE9B6 /* ChatGPT-Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ChatGPT-Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A7FD3D363005F622008C41E9 /* Exceptions for "ChatGPT-Mac" folder in "ChatGPT-Mac" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A77DD9E73000A48D005EE9B6 /* ChatGPT-Mac */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A77DD9EA3000A48D005EE9B6 /* ChatGPT-Mac */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A7FD3D363005F622008C41E9 /* Exceptions for "ChatGPT-Mac" folder in "ChatGPT-Mac" target */,
+			);
 			path = "ChatGPT-Mac";
 			sourceTree = "<group>";
 		};
@@ -22,6 +39,7 @@
 		A77DD9E53000A48D005EE9B6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				A7FD3D303005F519008C41E9 /* Sparkle in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -60,6 +78,9 @@
 				A77DD9EA3000A48D005EE9B6 /* ChatGPT-Mac */,
 			);
 			name = "ChatGPT-Mac";
+			packageProductDependencies = (
+				A7FD3D2F3005F519008C41E9 /* Sparkle */,
+			);
 			productName = "ChatGPT-Mac";
 			productReference = A77DD9E83000A48D005EE9B6 /* ChatGPT-Mac.app */;
 			productType = "com.apple.product-type.application";
@@ -88,6 +109,9 @@
 			);
 			mainGroup = A77DD9DF3000A48D005EE9B6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A7FD3D2E3005F519008C41E9 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A77DD9E93000A48D005EE9B6 /* Products */;
 			projectDirPath = "";
@@ -250,6 +274,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ChatGPT-Mac/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ChatGPT voice mode uses the microphone so you can talk to the assistant.";
@@ -286,6 +311,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ChatGPT-Mac/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ChatGPT voice mode uses the microphone so you can talk to the assistant.";
@@ -327,6 +353,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A7FD3D2E3005F519008C41E9 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A7FD3D2F3005F519008C41E9 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A7FD3D2E3005F519008C41E9 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A77DD9E03000A48D005EE9B6 /* Project object */;
 	validationLevel = 1;
