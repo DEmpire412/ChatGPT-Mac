@@ -515,11 +515,11 @@ enum Injection {
            wrappers. Clear only page-sized structural layers so native SwiftUI
            remains the sole window background, without flattening controls,
            cards, menus, or dialogs that need their own fill. */
-        main [class*="bg-token-main-surface-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
-        main [class*="bg-token-bg-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
-        main [class*="bg-token-sidebar-surface-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
-        main .bg-white:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
-        main .dark\\:bg-gray-950:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]),
+        main [class*="bg-token-main-surface-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]):not([role="menu"]):not([role="menu"] *):not([role="listbox"]):not([role="listbox"] *):not([data-radix-popper-content-wrapper]):not([data-radix-popper-content-wrapper] *):not(.popover):not(.popover *),
+        main [class*="bg-token-bg-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]):not([role="menu"]):not([role="menu"] *):not([role="listbox"]):not([role="listbox"] *):not([data-radix-popper-content-wrapper]):not([data-radix-popper-content-wrapper] *):not(.popover):not(.popover *),
+        main [class*="bg-token-sidebar-surface-primary"]:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]):not([role="menu"]):not([role="menu"] *):not([role="listbox"]):not([role="listbox"] *):not([data-radix-popper-content-wrapper]):not([data-radix-popper-content-wrapper] *):not(.popover):not(.popover *),
+        main .bg-white:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]):not([role="menu"]):not([role="menu"] *):not([role="listbox"]):not([role="listbox"] *):not([data-radix-popper-content-wrapper]):not([data-radix-popper-content-wrapper] *):not(.popover):not(.popover *),
+        main .dark\\:bg-gray-950:not(button):not(input):not(textarea):not([role="button"]):not([role="dialog"]):not([role="menu"]):not([role="menu"] *):not([role="listbox"]):not([role="listbox"] *):not([data-radix-popper-content-wrapper]):not([data-radix-popper-content-wrapper] *):not(.popover):not(.popover *),
         main .min-h-screen,
         main .h-screen,
         main .h-full,
